@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+
+  guardian:
+    build:
+      context: ./guardian
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./guardian:/app"
+
+  charge:
+    build:
+      context: ./charge
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - "./charge:/app"
