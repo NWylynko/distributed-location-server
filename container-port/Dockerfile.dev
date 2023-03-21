@@ -1,0 +1,24 @@
+FROM oven/bun:0.5.8
+
+RUN apt update
+RUN apt install curl -y
+ENV DOCKERVERSION=20.10.23
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/aarch64/docker-${DOCKERVERSION}.tgz \
+  && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 \
+                 -C /usr/local/bin docker/docker \
+  && rm docker-${DOCKERVERSION}.tgz
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json bun.lockb ./
+RUN bun install
+
+# Copy source code
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start Dev mode
+CMD ["bun", "run", "dev"]

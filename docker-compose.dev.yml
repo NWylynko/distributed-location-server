@@ -10,12 +10,48 @@ services:
       - "3000:3000"
     volumes:
       - "./guardian:/app"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 1000M
+        reservations:
+          cpus: '0.50'
+          memory: 250M
+
+  container-port:
+    build:
+      context: ./container-port
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000"
+    volumes:
+      - "./container-port:/app"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 250M
+        reservations:
+          cpus: '0.25'
+          memory: 125M
 
   charge:
     build:
       context: ./charge
       dockerfile: Dockerfile.dev
     ports:
-      - "3001:3000"
+      - "3000"
     volumes:
       - "./charge:/app"
+    deploy:
+      mode: replicated
+      replicas: 6
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 200M
+        reservations:
+          cpus: '0.25'
+          memory: 100M
