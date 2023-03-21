@@ -2,20 +2,27 @@ import { InstancesStore } from "./instances.js";
 
 export const healthChecker = (instancesStore: InstancesStore) => {
   let running = false
-  setInterval(async () => {
+  return setInterval(async () => {
     if (running) {
       console.log('Health check is taking longer than 30 seconds')
       return;
     }
     running = true
 
-    const instances = [...instancesStore.getInstances()]
+    console.log('checking health of instances...')
+
+    const instances = instancesStore.getInstances()
+
+    console.log('instances:', instances.length)
 
     await Promise.all(instances.map(async (instance) => {
 
       if (instance === undefined) {
         return; // already been removed
       }
+
+      const time_key = `health check: ${instance.id}`
+      console.time(time_key)
 
       try {
         const url = new URL(`http://host.docker.internal:${instance.port}`)
@@ -27,11 +34,11 @@ export const healthChecker = (instancesStore: InstancesStore) => {
         const text = await response.text()
 
         if (text !== "OK") {
-          console.log(`instance ${instance.id} has been disconnected`)
+          console.log(time_key, `disconnected`)
           instancesStore.deregisterInstance(instance.id);
         }
 
-        console.log(`instance ${instance.id} is still connected`)
+        console.log(time_key, `connected`)
         instancesStore.updateInstance(instance.id, (i) => {
           if (i) {
             i.timestamp = Date.now()
@@ -39,8 +46,10 @@ export const healthChecker = (instancesStore: InstancesStore) => {
           return i
         })
       } catch (error) {
-        console.log(`failed to reach instance ${instance.id}`)
+        console.log(time_key, `failed to reach`)
         instancesStore.deregisterInstance(instance.id);
+      } finally {
+        console.timeEnd(time_key)
       }
       
     }))
