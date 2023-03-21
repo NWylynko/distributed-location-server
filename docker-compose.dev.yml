@@ -7,9 +7,17 @@ services:
       context: ./guardian
       dockerfile: Dockerfile.dev
     ports:
-      - "3000:3000"
+      - "4000:3000"
+    environment:
+      - CONTAINER_API=http://container-port:3000
+      - INSTANCES_PER_LAYER=16
+      - MAP_HEIGHT=400
+      - MAP_WIDTH=400
+      - OVERLAP=10
     volumes:
       - "./guardian:/app"
+    depends_on:
+      - container-port
     deploy:
       resources:
         limits:
@@ -45,9 +53,13 @@ services:
       - "3000"
     volumes:
       - "./charge:/app"
+    environment:
+      - GUARDIAN_API=http://guardian:3000
+    depends_on:
+      - guardian
     deploy:
       mode: replicated
-      replicas: 6
+      replicas: 32
       resources:
         limits:
           cpus: '0.50'

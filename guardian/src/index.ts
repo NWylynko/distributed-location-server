@@ -1,9 +1,23 @@
-import {type Serve} from "bun";
+import { createInstancesStore, type InstancesStore } from './instances.js';
+import { Hono } from "hono";
 
-export default {
-  fetch(req: Request) {
-    
-    return new Response(`Hello Guardian from Bun!`);
-  },
-  port: 3000,
-} satisfies Serve;
+import { registerHander } from "./handlers/register.js";
+import { instancesHandler } from "./handlers/instances.js";
+import { healthChecker } from './healthChecker.js';
+
+declare global {
+  var instancesStore: InstancesStore;
+}
+
+globalThis.instancesStore = globalThis.instancesStore ?? createInstancesStore();
+
+const app = new Hono()
+const instancesStore = globalThis.instancesStore
+
+healthChecker(instancesStore)
+
+app.get('/', (ctx) => ctx.text('Hello Guardian from Bun!'))
+app.post('/register', registerHander(instancesStore))
+app.get('/instances', instancesHandler(instancesStore))
+
+export default app
