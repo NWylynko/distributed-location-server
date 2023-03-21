@@ -18,7 +18,6 @@ export const registerHander = (instancesStore: InstancesStore) => async (ctx: Co
 
   const existingInstance = instancesStore.getInstances().find((instance) => instance?.hostname === containerId);
 
-  console.log({ containerId, instanceId, port, existingInstance })
 
   if (existingInstance) {
     const instance = instancesStore.updateInstance(existingInstance.id, (existingInstance) => {

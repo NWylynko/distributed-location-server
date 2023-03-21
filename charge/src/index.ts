@@ -25,5 +25,3 @@ export default {
 } satisfies Serve;
 
 const { instance } = await register();
-
-console.log(instance)

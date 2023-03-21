@@ -23,14 +23,12 @@ export const create3dMatrix = <ItemId extends string, Item extends { id: ItemId 
 
     // either replace a instance that went down, or add to the end
     const existingEmptyItem = items.findIndex((item) => item === undefined)
-    console.log({ existingEmptyItem })
     if (existingEmptyItem === -1) {
       items.push(fullItem);
     } else {
       items[existingEmptyItem] = fullItem
     }
 
-    console.log(items.length)
 
     return fullItem;
   }
